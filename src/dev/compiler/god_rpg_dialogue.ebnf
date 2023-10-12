@@ -1,0 +1,67 @@
+### choice ###
+choice_stmt: 'choice' [name] ':' block choice_var; # some comment
+choice_var: name ':' block [choice_var];
+
+### label ###
+label_stmt: 'label' name ':' block;
+
+
+### if-elif-else ###
+if_stmt: 'if' expression ':' block elif_stmt | 'if' expression ':' block [else_block];
+elif_stmt: 'elif' expression ':' block elif_stmt | 'elif' expression ':' block [else_block];
+else_block: 'else' ':' block;
+
+### while loop ###
+while_stmt: 'while' expression ':' block;
+
+### block ###
+block: newline indent statements dedent | simple_stmts;
+
+### statements ###
+statements: {statement};
+statement: compound_stmt  | simple_stmts;
+
+simple_stmt: assignment | return_stmt | 'pass' | saying | jump | say | string | show;
+compound_stmt: if_stmt | while_stmt | choice_stmt;
+
+### simple statements ###
+assignment: name '=' expression;
+return_stmt: 'return' [expressions];
+saying: name string;
+jump: 'jump' name;
+say: 'say' string | 'say' name;
+play: 'play' string | 'play' name;
+show: 'show' string | 'show' name;
+
+### logic and expressions ###
+expressions: expression {',' expression} [','] | expression ',' | expression;
+expression: or 'if' or 'else' expression | or '?' or ':' expression | or;
+or: and {'or' or} | and {'||' or} | and;
+and: not {'and' and} | not {'&&' and} | not;
+not: '!' comparison | 'not' comparison | comparison;
+
+### comparison operators ###
+comparison: bitwise_or {comp_op_pair} | bitwise_or;
+comp_op_pair: not_eq | eq | lte | lt | gte | gt;
+
+not_eq: '!=' bitwise_or;
+eq: '==' bitwise_or;
+lte: '<=' bitwise_or;
+lt: '<' bitwise_or;
+gte: '>=' bitwise_or;
+gt: '>' bitwise_or;
+
+### bitwise math ###
+bitwise_or: bitwise_or '|' bitwise_xor | bitwise_xor;
+bitwise_xor: bitwise_xor '^' bitwise_and | bitwise_and;
+bitwise_and: bitwise_and '&' sum | sum;
+
+### math ###
+sum: sum '+' term | sum '-' term | term;
+term: term '*' factor | term '/' factor | term '//' factor | term '%' factor | factor;
+factor: '+' factor | '-' factor | '~' factor | power;
+power: atom | atom '**' factor;
+atom: 'True' | 'False' | 'None' | name | strings | number;
+
+### extended basics ###
+name: letter [{word_symbol | '_'}] | '_' [{word_symbol | '_'}];
